@@ -1,5 +1,6 @@
 #include "translate.h"
-#include "googleTranslate.h"
+
+#include "google_translate.h"
 
 TranslateFactory *TranslateFactory::instance = nullptr;
 

@@ -5,18 +5,20 @@ set(QT_LIB Qt5::Widgets Qt5::Network)
 
 include_directories(
   "${PROJECT_SOURCE_DIR}/src"
-  "${PROJECT_SOURCE_DIR}/thirdparty/qxtglobalshortcut5/include"
-  ${})
+  "${PROJECT_SOURCE_DIR}/thirdparty/qxtglobalshortcut5/include")
+
 add_executable(MyTranslation "")
 target_sources(MyTranslation
   PRIVATE
   main.cc
-  trayWidget.cc
-  trayWidget.h
+  tray_widget.cc
+  tray_widget.h
+  shortcut.cc
+  shortcut.h
   translate.cc
   translate.h
-  googleTranslate.cc
-  googleTranslate.h
+  google_translate.cc
+  google_translate.h
   http_util.cc
   http_util.h
   screen_shoot.cc

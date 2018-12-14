@@ -1,9 +1,7 @@
 #include <QApplication>
 #include <QMessageBox>
 
-#include "trayWidget.h"
-
-namespace Translation {
+#include "tray_widget.h"
 
 #ifndef QT_NO_SYSTEMTRAYICON
 
@@ -15,9 +13,9 @@ int main(int argc, char *argv[]) {
         QObject::tr("Unable to detect system tray on this system"));
     return 1;
   }
-  QApplication::setQuitOnLastWindowClosed(false);
+  QApplication::setQuitOnLastWindowClosed(false);  
 
-  TrayWidget w;
+  Translation::TrayWidget w;
   return app.exec();
 }
 
@@ -40,4 +38,3 @@ int main(int argc, char *argv[]) {
 }
 
 #endif
-} // namespace Translation

@@ -1,4 +1,4 @@
-#include "googleTranslate.h"
+#include "google_translate.h"
 
 #include <http_util.h>
 #include <qdebug.h>
