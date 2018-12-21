@@ -11,11 +11,11 @@ int main(int argc, char *argv[]) {
     QMessageBox::critical(
         nullptr, QObject::tr("Systray"),
         QObject::tr("Unable to detect system tray on this system"));
-    return 1;
+    return EXIT_FAILURE;
   }
   QApplication::setQuitOnLastWindowClosed(false);  
 
-  Translation::TrayWidget w;
+  MyTranslation::TrayWidget w;
   return app.exec();
 }
 

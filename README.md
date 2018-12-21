@@ -1,0 +1,3 @@
+- [] TODO implement Singleton management
+- [] TODO YouDao dict
+- [] TODO tencent Translation api

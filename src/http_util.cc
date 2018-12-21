@@ -1,46 +1,73 @@
 #include "http_util.h"
+
+#include <string>
+
 #include <QEventLoop>
 #include <QNetworkReply>
 #include <QUrlQuery>
-#include <string>
 
-HttpUtil *HttpUtil::instance = nullptr;
+#include "no_destructor.h"
 
-HttpUtil *HttpUtil::Instance() {
-  if (!instance) {
-    instance = new HttpUtil;
-  }
-  return instance;
+namespace MyTranslation {
+    
+Status HttpUtil::request(
+    RequestType type, std::string *data, const std::string &baseUrl,
+    const std::initializer_list<std::pair<std::string, std::string>> query) {
+    QNetworkRequest request;
+    request.setHeader(QNetworkRequest::UserAgentHeader,
+                      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36");
+    QUrl url(baseUrl.data());
+    QUrlQuery urlq;
+    for (const auto field : query) {
+        urlq.addQueryItem(field.first.data(), field.second.data());
+    }
+    
+    QNetworkReply *reply;
+    switch (type) {
+    case GET:
+        url.setQuery(urlq);
+        request.setUrl(url);
+        reply = qnam.get(request);
+        break;
+    case POST:
+        request.setUrl(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+        reply = qnam.post(request, urlq.toString(QUrl::FullyEncoded).toUtf8());
+        break;
+    default:
+        return Status::NetworkError("unsupport request type");
+    }
+    
+    QEventLoop eventLoop;
+    QObject::connect(reply, &QNetworkReply::finished, &eventLoop,
+                     &QEventLoop::quit);
+    eventLoop.exec();
+    
+    if (reply->error() != QNetworkReply::NoError) {        
+        return Status::NetworkError(reply->errorString().toStdString());
+    }
+    
+    data->append(reply->readAll());
+    reply->deleteLater();
+    return Status::OK();
 }
 
-// char *mallocResponseData (QNetworkReply *reply) {
-//   auto replyDate = reply->readAll();
-//   size_t dataLen = replyDate.length();
-//   char *data = new char[dataLen];
-//   memcpy(data, replyDate.constData(), dataLen);
-//   return data;
-// }
-
-const HttpResponse HttpUtil::get(const std::string &url) {
-  QNetworkRequest request;
-  request.setRawHeader("accept", "*/*");
-  request.setRawHeader("User-Agent",
-                       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                       "(KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36");
-  request.setUrl(QUrl(url.c_str()));
-  QNetworkReply *reply = qnam.get(request);
-  QEventLoop eventLoop;
-  QObject::connect(reply, &QNetworkReply::finished, &eventLoop,
-                   &QEventLoop::quit);
-  eventLoop.exec();
-  int code = reply->error();
-  std::string errorstr = reply->errorString().toStdString();
-  std::string data = reply->readAll().toStdString();
-  HttpResponse response = {
-    .data = data,
-    .code = code,
-    .errormsg = errorstr
-  };
-  reply->deleteLater();
-  return response;
+Status HttpUtil::get(
+    std::string *data, const std::string &baseUrl,
+    std::initializer_list<std::pair<std::string, std::string>> query) {
+    return request(GET, data, baseUrl, query);
 }
+
+Status HttpUtil::post(
+    std::string *data, const std::string &baseUrl,
+    std::initializer_list<std::pair<std::string, std::string>> query) {
+    return request(POST, data, baseUrl, query);
+}
+
+HttpUtil *getHttpUtil() {
+    static NoDestructor<HttpUtil> singleton;
+    return singleton.get();
+}
+
+} // namespace Translation

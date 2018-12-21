@@ -1,23 +1,27 @@
 #ifndef GOOGLETRANSLATE_H
 #define GOOGLETRANSLATE_H
 
-#include "translate.h"
 #include <qstring.h>
 
+#include "translate.h"
+
+namespace MyTranslation {
+
 class GoogleTranslate : public Translate {
-public:
-  GoogleTranslate();
-  TranslateResult textTranslate(std::string &&) override;
-  TranslateResult imgTranslate(std::string &) override;
-  ~GoogleTranslate() override;
+  public:
+    GoogleTranslate();
+    Status textTranslate(const std::string &, TranslateResult *result) override;
+    Status imgTranslate(const std::string &, TranslateResult *result) override;
+    ~GoogleTranslate() override;
 
-private:
-  void filterTranslateText(QString &text);
+  private:
+    void filterTranslateText(QString &text);
 
-  std::pair<long, long> &getTKK();
-  std::pair<long, long> TKK;
-  void updateTKK();
-  QString TK;
+    std::pair<long, long> &getTKK();
+    std::pair<long, long> TKK;
+    Status updateTKK();
+    QString TK;
 };
+} // namespace Translation
 
 #endif /* GOOGLETRANSLATE_H */

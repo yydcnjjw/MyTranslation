@@ -3,12 +3,14 @@
 
 #include <map>
 #include <string>
-// namespace Translation {
+
+#include "status.h"
+
+namespace MyTranslation {
 
 enum TranslateApi { GOOGLE = 0x1, YOUDAO = 0x2, TENCENT = 0x4, BAIDU = 0x8 };
 
 struct TranslateResult {
-    int code;
     TranslateApi api;
     std::string translateResult;
     std::map<std::string, std::string> extraResult;
@@ -16,13 +18,13 @@ struct TranslateResult {
 
 class Translate {
   public:
-    virtual TranslateResult textTranslate(std::string &&) = 0;
-    virtual TranslateResult imgTranslate(std::string &) = 0;
-    
+    virtual Status textTranslate(const std::string &, TranslateResult *result) = 0;
+    virtual Status imgTranslate(const std::string &, TranslateResult *result) = 0;
+
     Translate() = default;
-    Translate(const Translate&) = delete;
-    Translate& operator=(const Translate&) = delete;
-    
+    Translate(const Translate &) = delete;
+    Translate &operator=(const Translate &) = delete;
+
     virtual ~Translate();
 };
 
@@ -36,19 +38,7 @@ class TranslateFactory {
   private:
     static TranslateFactory *instance;
 };
-
-class TranslateException : public std::exception {
-  public:
-    TranslateException(const std::string &error) : error(error) {}
-    const char *what() const noexcept {
-        return std::string("Translate exception: " + error).c_str();
-        // return "";
-    }
-
-  private:
-    std::string error;
-};
-
-// }  // Translation
+    
+} // namespace Translation
 
 #endif /* TRANSLATE_H */

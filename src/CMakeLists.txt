@@ -13,14 +13,19 @@ target_sources(MyTranslation
   main.cc
   tray_widget.cc
   tray_widget.h
-  shortcut.cc
-  shortcut.h
+  translation_widget.cc
+  translation_widget.h
+  shortcut_manager.cc
+  shortcut_manager.h
+  status.h
+  status.cc
   translate.cc
   translate.h
   google_translate.cc
   google_translate.h
   http_util.cc
   http_util.h
+  no_destructor.h
   screen_shoot.cc
   screen_shoot.h)
 target_link_libraries(MyTranslation qxtglobalshortcut5 ${QT_LIB})

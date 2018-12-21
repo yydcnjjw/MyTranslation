@@ -1,32 +1,37 @@
 #ifndef HTTP_UTIL_H
 #define HTTP_UTIL_H
 
+#include <initializer_list>
+
 #include <QNetworkAccessManager>
 
-// namespace Translation {
-  
-struct HttpResponse {
-  std::string data;
-  int code;
-  std::string errormsg;
-};
+#include "status.h"
 
+namespace MyTranslation {
+// TODO: hide impl information
 class HttpUtil {
-public:
-  static HttpUtil *Instance();
+  public:
+    HttpUtil() = default;
+    HttpUtil(const HttpUtil &) = delete;
+    HttpUtil &operator=(const HttpUtil &) = delete;
 
-  HttpUtil() = default;
-  HttpUtil(const HttpUtil &) = delete;
-  HttpUtil &operator=(const HttpUtil &) = delete;
+    Status get(std::string *data, const std::string &baseUrl,
+               const std::initializer_list<std::pair<std::string, std::string>>
+                   il = {});
+    Status post(std::string *data, const std::string &baseUrl,
+                const std::initializer_list<std::pair<std::string, std::string>>
+                    il = {});
 
-  const HttpResponse get(const std::string &url);
-  char *post(const std::string &url);
-
-private:
-  static HttpUtil *instance;
-  QNetworkAccessManager qnam;
+  private:
+    QNetworkAccessManager qnam;
+    enum RequestType { GET, POST };
+    Status
+    request(RequestType type, std::string *data, const std::string &baseUrl,
+            const std::initializer_list<std::pair<std::string, std::string>>
+                il = {});
 };
+extern HttpUtil *getHttpUtil();
 
-// } // namespace Translation
+} // namespace MyTranslation
 
 #endif /* HTTP_UTIL_H */
