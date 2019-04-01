@@ -9,9 +9,13 @@
 #include "status.h"
 
 namespace MyTranslation {
-
-enum ShortcutAction { CLIPBOARD, SCREEN };
-
+    
+enum ShortcutAction {
+    SELECT,
+    SCREEN,
+    WINDOW_HIDE
+};
+    
 class ShortcutManager {
   public:
     ShortcutManager();

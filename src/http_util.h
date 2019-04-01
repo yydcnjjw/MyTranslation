@@ -9,26 +9,27 @@
 
 namespace MyTranslation {
 // TODO: hide impl information
+enum RequestType { GET, POST };
+struct Url {
+    std::string url;
+    std::vector<std::pair<std::string, std::string>> query;
+    RequestType type;
+};
+typedef struct Url Url;
+
 class HttpUtil {
   public:
     HttpUtil() = default;
+    Status request(const Url &url, std::string *data);
+    Status get(const std::string &baseUrl, std::string *data);
+    Status post(const std::string &baseUrl, std::string *data);
+
     HttpUtil(const HttpUtil &) = delete;
     HttpUtil &operator=(const HttpUtil &) = delete;
 
-    Status get(std::string *data, const std::string &baseUrl,
-               const std::initializer_list<std::pair<std::string, std::string>>
-                   il = {});
-    Status post(std::string *data, const std::string &baseUrl,
-                const std::initializer_list<std::pair<std::string, std::string>>
-                    il = {});
-
   private:
     QNetworkAccessManager qnam;
-    enum RequestType { GET, POST };
-    Status
-    request(RequestType type, std::string *data, const std::string &baseUrl,
-            const std::initializer_list<std::pair<std::string, std::string>>
-                il = {});
+    Status buildQuery(const Url &url, QUrlQuery &query);
 };
 extern HttpUtil *getHttpUtil();
 

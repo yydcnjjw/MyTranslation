@@ -7,21 +7,15 @@
 
 namespace MyTranslation {
 
-class GoogleTranslate : public Translate {
+class GoogleTranslateApi : public TranslateApi {
   public:
-    GoogleTranslate();
-    Status textTranslate(const std::string &, TranslateResult *result) override;
-    Status imgTranslate(const std::string &, TranslateResult *result) override;
-    ~GoogleTranslate() override;
-
-  private:
-    void filterTranslateText(QString &text);
-
-    std::pair<long, long> &getTKK();
-    std::pair<long, long> TKK;
-    Status updateTKK();
-    QString TK;
+    GoogleTranslateApi(){};
+    ~GoogleTranslateApi() override {};
+    TranslateApiType getApiInfo() override;
+    Status buildUrl(Url &url, std::string &text, TranslateLanguage source, TranslateLanguage target) override;
+    Status handleResponse(std::string &response,
+                          TranslateResult &result) override;
 };
-} // namespace Translation
+} // namespace MyTranslation
 
 #endif /* GOOGLETRANSLATE_H */

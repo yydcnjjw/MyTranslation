@@ -26,11 +26,15 @@ class Status {
     static Status ShortcutError(const std::string &msg) {
         return Status(S_SHORTCUT_ERROR, msg);
     }
+    static Status ReRequest(const std::string &msg) {
+        return Status(S_RE_REQUEST, msg);
+    }
 
     bool ok() const { return (code() == S_OK); }
-    bool networkError() const { return (code() == S_NETWORK_ERROR); }
-    bool jsonParsorError() const { return (code() == S_JSON_PARSER_ERROR); }
-    bool shortcutError() const { return (code() == S_SHORTCUT_ERROR); }
+    bool IsNetworkError() const { return (code() == S_NETWORK_ERROR); }
+    bool IsJsonParsorError() const { return (code() == S_JSON_PARSER_ERROR); }
+    bool IsShortcutError() const { return (code() == S_SHORTCUT_ERROR); }
+    bool IsRerequest() const { return (code() == S_RE_REQUEST); }
     std::string ToString() const;
 
   private:
@@ -38,8 +42,9 @@ class Status {
     enum Code {
         S_OK = 0,
         S_NETWORK_ERROR = 1,
-        S_JSON_PARSER_ERROR = 2,
-        S_SHORTCUT_ERROR = 3
+        S_RE_REQUEST = 2,
+        S_JSON_PARSER_ERROR = 3,
+        S_SHORTCUT_ERROR = 4,
     };
     Status(Code code, const std::string &msg);
     static const char *CopyState(const char *s);

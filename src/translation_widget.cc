@@ -3,6 +3,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <qapplication.h>
+#include <QLayout>
 
 #include "no_destructor.h"
 #include "screen_shoot.h"
@@ -14,14 +15,18 @@ TranslationWidget::TranslationWidget() { initUi(); }
 void TranslationWidget::initUi() {
     setFixedWidth(450);
     setWindowFlag(Qt::WindowStaysOnTopHint);
-    contentLabel_ = new QLabel();
+    contentLabel_ = new QLabel;
     contentLabel_->setWordWrap(true);
     contentLabel_->setTextInteractionFlags(Qt::TextSelectableByMouse);
     contentLabel_->setFixedWidth(400);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(contentLabel_);
+    setLayout(layout);
 }
 
-Status TranslationWidget::requestTranslate(const QString &text) {
+Status TranslationWidget::requestTranslate(const QString &qtext) {
     QString translation;
+    std::string text = qtext.toStdString();
     static std::map<TranslateApiName, Translate *> *translates;
     if (translates == nullptr) {
         translates = TranslateFactory::getFactory()->getTranslates(GOOGLE);
@@ -30,8 +35,9 @@ Status TranslationWidget::requestTranslate(const QString &text) {
         QString apiName(translate.first.c_str());
         Translate *translateApi = translate.second;
         TranslateResult result;
-        Status s = translateApi->textTranslate(text.toStdString(), &result);
+        Status s = translateApi->textTranslate(text, result);
         if (!s.ok()) {
+            qDebug() << s.ToString().data();
             return s;
         }
 
@@ -42,27 +48,31 @@ Status TranslationWidget::requestTranslate(const QString &text) {
         }
     }
     translation.remove(translation.length() - 1, 1);
+    
+    contentLabel_->setText(translation);
     showTranslation();
     return Status::OK();
 }
 
 void TranslationWidget::showTranslation() {
     move(QCursor::pos());
-    contentLabel_->setText(content_.data());
     show();
     activateWindow();
 }
 
-void SelectTranslationWidget::Translation() {
+void TranslationWidget::selectTranslation() {
     const QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData(QClipboard::Selection);
     if (mimeData->hasText()) {
         QString text = clipboard->text(QClipboard::Selection);
-        requestTranslate(text);
+        Status s = requestTranslate(text);
+        if (!s.ok()) {
+            qDebug() << s.ToString().data();
+        }
     }
 }
 
-void ClipScreenTranslationWidget::Translation() {
+void TranslationWidget::clipScreentTranslation() {
     // ScreenShoot::Instance()->show();
     // QEventLoop eventLoop;
     // QObject::connect(ScreenShoot::Instance(), &ScreenShoot::hided,
@@ -96,13 +106,8 @@ void ClipScreenTranslationWidget::Translation() {
     // requestTranslate(text);
 }
 
-TranslationWidget *getSelectTranslationWidget() {
-    static NoDestructor<SelectTranslationWidget> singleton;
-    return singleton.get();
-}
-    
-TranslationWidget *getClipScreenTranslationWidget() {
-    static NoDestructor<ClipScreenTranslationWidget> singleton;
+TranslationWidget *getTranslationWidget() {
+    static NoDestructor<TranslationWidget> singleton;
     return singleton.get();
 }
 

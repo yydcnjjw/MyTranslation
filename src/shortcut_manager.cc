@@ -4,14 +4,16 @@
 
 #include "no_destructor.h"
 #include "translation_widget.h"
+#include <qdebug.h>
 
 namespace MyTranslation {
 
 namespace {
 class ShortcutFunction : public QObject {
   public slots:
-    void clipboard() { getSelectTranslationWidget()->Translation(); }
-    void screen() { getClipScreenTranslationWidget()->Translation(); }
+    void select() { getTranslationWidget()->selectTranslation(); }
+    void screen() { getTranslationWidget()->clipScreentTranslation(); }
+    void translationWidgetHide() { getTranslationWidget()->hide(); }
 };
 
 struct Shortcut {
@@ -24,10 +26,13 @@ struct Shortcut {
 ShortcutFunction shortcutFunction;
 
 std::vector<struct Shortcut> origShorcutSet = {
-    {ShortcutAction::CLIPBOARD, "Alt+t", &shortcutFunction,
-     &ShortcutFunction::clipboard},
-    {ShortcutAction::SCREEN, "Ctrl+t", &shortcutFunction,
-     &ShortcutFunction::screen}};
+    {ShortcutAction::SELECT, "Alt+t", &shortcutFunction,
+     &ShortcutFunction::select},
+    // {ShortcutAction::WINDOW_HIDE, "Ctrl+q", &shortcutFunction,
+    //  &ShortcutFunction::translationWidgetHide, false}
+    // {ShortcutAction::SCREEN, "Ctrl+t", &shortcutFunction,
+    //  &ShortcutFunction::screen}
+};
 } // namespace
 
 ShortcutManager::ShortcutManager() { loadOrigShortcut(); }
